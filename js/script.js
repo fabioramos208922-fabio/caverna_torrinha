@@ -36,7 +36,7 @@ const currentUtm = {};
 try { const params = new URLSearchParams(window.location.search); const values = utm.read(window.location.search, document.referrer); const consent = localStorage.getItem('torrinha_cookie_consent') === 'accepted'; utm.keys.forEach(k => { if (values[k]) currentUtm[k] = values[k]; }); if (consent) utm.keys.forEach(k => { if (!currentUtm[k]) { try { currentUtm[k] = sessionStorage.getItem(k) || ''; } catch {} } if (currentUtm[k]) { try { sessionStorage.setItem(k, currentUtm[k]); } catch {} } }); } catch {}
 const getOrigem = () => utm.origem(currentUtm);
 const trackingData = () => Object.fromEntries(Object.entries(currentUtm).filter(([, v]) => v));
-const prepareWhatsApp = (button) => { if (!button.dataset.waBase) button.dataset.waBase = button.getAttribute('href') || ''; const url = new URL(button.dataset.waBase, window.location.href); const text = url.searchParams.get('text') || ''; const origem = getOrigem(); url.searchParams.set('text', origem ? `${text} (Origem: ${origem})` : text); button.href = url.toString(); button.dataset.utmOrigem = origem; if (new URLSearchParams(window.location.search).get('utm_debug') === '1') console.debug('[UTM]', { captured: currentUtm, origem, href: button.href }); };
+const prepareWhatsApp = (button) => { if (!button.dataset.waBase) button.dataset.waBase = button.getAttribute('href') || ''; const url = new URL(button.dataset.waBase, window.location.href); const text = button.dataset.routeSpecs || url.searchParams.get('text') || ''; const origem = getOrigem(); url.searchParams.set('text', button.dataset.skipOrigem ? text : (origem ? `${text} (Origem: ${origem})` : text)); button.href = url.toString(); button.dataset.utmOrigem = origem; if (new URLSearchParams(window.location.search).get('utm_debug') === '1') console.debug('[UTM]', { captured: currentUtm, origem, href: button.href }); };
 const sendConversion = () => { if (ADS_CONVERSION_LABEL && typeof window.gtag === 'function') window.gtag('event', 'conversion', { send_to: 'AW-18500249861/' + ADS_CONVERSION_LABEL }); };
 const trackWhatsAppClick = (button) => { prepareWhatsApp(button); const data = { ...trackingData(), local_botao: button.dataset.origem || 'outro', roteiro: button.dataset.roteiro || button.closest('[data-route]')?.dataset.route || '' }; if (!trackingConsent) return; window.gtag('event', 'clique_whatsapp', { ...data, transport_type: 'beacon' }); sendConversion(); };
 document.addEventListener('click', (event) => { const link = event.target.closest('a[href]'); if (!link) return; const href = link.href.toLowerCase(); if (/^https:\/\/(wa\.me|api\.whatsapp\.com)\//.test(href)) trackWhatsAppClick(link); if (href.startsWith('tel:') && trackingConsent) { window.gtag('event', 'clique_telefone', { local_botao: link.dataset.origem || 'outro' }); sendConversion(); } });
@@ -221,6 +221,13 @@ const routeDetails = {
     notes: 'É a melhor opção para quem quer sair com a noção mais completa da geologia, do percurso e das principais formações do local.'
   }
 };
+routeCards.forEach((card) => {
+  const data = routeDetails[card.dataset.route];
+  const button = card.querySelector('.btn-whatsapp');
+  if (!data || !button) return;
+  button.dataset.skipOrigem = 'true';
+  button.dataset.routeSpecs = [`Ol\u00e1! Vim pelo site da Caverna Torrinha e gostaria de informa\u00e7\u00f5es sobre o ${data.kicker} e os outros roteiros dispon\u00edveis.`, `Acesso: ${data.stats.find(([label]) => label === 'Acesso' || label === 'Acesso a p\u00e9')?.[1] || ''}`, `Dura\u00e7\u00e3o: ${data.stats.find(([label]) => label === 'Dura\u00e7\u00e3o')?.[1] || ''}`, `Valor: ${data.stats.find(([label]) => label === 'Valor por pessoa')?.[1] || ''}`].join('\n');
+});
 const galleryInfo = [
   { kicker: 'Formações', title: 'Salão principal', text: 'Uma vista ampla da caverna, com destaque para os salões e o relevo das formações.' },
   { kicker: 'Raridade', title: 'Flores de aragonita', text: 'Detalhe de uma das formações mais raras da Torrinha, com textura delicada e visual marcante.' },
@@ -316,6 +323,8 @@ const renderRouteModal = (routeKey) => {
   const cta = document.createElement('a');
   cta.className = 'btn btn-primary btn-whatsapp route-modal__whatsapp';
   cta.dataset.origem = `modal-${routeKey}`;
+  cta.dataset.skipOrigem = 'true';
+  cta.dataset.routeSpecs = [`Ol\u00e1! Vim pelo site da Caverna Torrinha e gostaria de informa\u00e7\u00f5es sobre o ${data.kicker} e os outros roteiros dispon\u00edveis.`, `Acesso: ${data.stats.find(([label]) => label === 'Acesso' || label === 'Acesso a p\u00e9')?.[1] || ''}`, `Dura\u00e7\u00e3o: ${data.stats.find(([label]) => label === 'Dura\u00e7\u00e3o')?.[1] || ''}`, `Valor: ${data.stats.find(([label]) => label === 'Valor por pessoa')?.[1] || ''}`].join('\n');
   cta.target = '_blank';
   cta.rel = 'noopener';
   cta.href = `https://wa.me/5575998561666?text=${encodeURIComponent(`Olá! Vi o site da Caverna Torrinha e quero reservar o ${data.kicker}.`)}`;
