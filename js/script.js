@@ -9,7 +9,11 @@ const formTelefone = document.getElementById('telefone');
 const formMensagem = document.getElementById('mensagem');
 const utm = window.TorrinhaUTM;
 let trackingConsent = false;
-const ADS_CONVERSION_LABEL = ''; // preencher com o rótulo da ação de conversão
+const ADS_CONVERSION_LABELS = Object.freeze({
+  clique_whatsapp: 'nyTcCIyR6ZsdEIXSzfVE',
+  generate_lead: 'gZQeCL3j6ZsdEIXSzfVE',
+  clique_telefone: '8a_sCOTq55sdEIXSzfVE'
+});
 const isPixel = (v) => /^\d{15,16}$/.test(v || '');
 const initTracking = () => {
 trackingConsent = true;
@@ -37,9 +41,9 @@ try { const params = new URLSearchParams(window.location.search); const values =
 const getOrigem = () => utm.origem(currentUtm);
 const trackingData = () => Object.fromEntries(Object.entries(currentUtm).filter(([, v]) => v));
 const prepareWhatsApp = (button) => { if (!button.dataset.waBase) button.dataset.waBase = button.getAttribute('href') || ''; const url = new URL(button.dataset.waBase, window.location.href); const text = button.dataset.routeSpecs || url.searchParams.get('text') || ''; const origem = getOrigem(); url.searchParams.set('text', button.dataset.skipOrigem ? text : (origem ? `${text} (Origem: ${origem})` : text)); button.href = url.toString(); button.dataset.utmOrigem = origem; if (new URLSearchParams(window.location.search).get('utm_debug') === '1') console.debug('[UTM]', { captured: currentUtm, origem, href: button.href }); };
-const sendConversion = () => { if (ADS_CONVERSION_LABEL && typeof window.gtag === 'function') window.gtag('event', 'conversion', { send_to: 'AW-18500249861/' + ADS_CONVERSION_LABEL }); };
-const trackWhatsAppClick = (button) => { prepareWhatsApp(button); const data = { ...trackingData(), local_botao: button.dataset.origem || 'outro', roteiro: button.dataset.roteiro || button.closest('[data-route]')?.dataset.route || '' }; if (!trackingConsent) return; window.gtag('event', 'clique_whatsapp', { ...data, transport_type: 'beacon' }); sendConversion(); };
-document.addEventListener('click', (event) => { const link = event.target.closest('a[href]'); if (!link) return; const href = link.href.toLowerCase(); if (/^https:\/\/(wa\.me|api\.whatsapp\.com)\//.test(href)) trackWhatsAppClick(link); if (href.startsWith('tel:') && trackingConsent) { window.gtag('event', 'clique_telefone', { local_botao: link.dataset.origem || 'outro' }); sendConversion(); } });
+const sendConversion = (eventName) => { const label = ADS_CONVERSION_LABELS[eventName]; if (trackingConsent && label && typeof window.gtag === 'function') window.gtag('event', 'conversion', { send_to: `AW-18500249861/${label}` }); };
+const trackWhatsAppClick = (button) => { prepareWhatsApp(button); const data = { ...trackingData(), local_botao: button.dataset.origem || 'outro', roteiro: button.dataset.roteiro || button.closest('[data-route]')?.dataset.route || '' }; if (!trackingConsent) return; window.gtag('event', 'clique_whatsapp', { ...data, transport_type: 'beacon' }); sendConversion('clique_whatsapp'); };
+document.addEventListener('click', (event) => { const link = event.target.closest('a[href]'); if (!link) return; const href = link.href.toLowerCase(); if (/^https:\/\/(wa\.me|api\.whatsapp\.com)\//.test(href)) trackWhatsAppClick(link); if (href.startsWith('tel:') && trackingConsent) { window.gtag('event', 'clique_telefone', { local_botao: link.dataset.origem || 'outro' }); sendConversion('clique_telefone'); } });
 ['mousedown', 'touchstart', 'focusin'].forEach(type => document.addEventListener(type, event => { const button = event.target.closest('a[href^="https://wa.me"], a[href^="https://api.whatsapp.com"]'); if (button) prepareWhatsApp(button); }, type === 'touchstart' ? { passive: true } : undefined));
 document.querySelectorAll('.btn-whatsapp').forEach(prepareWhatsApp);
 const lightbox = document.getElementById('lightbox');
@@ -450,7 +454,7 @@ contactForm?.addEventListener('submit', (event) => {
   const url = buildWhatsAppLink();
   const data = { ...trackingData(), origem: getOrigem() };
   document.querySelectorAll('#contactForm input[type="hidden"]').forEach((field) => { field.value = currentUtm[field.name] || ''; });
-  if (trackingConsent) { window.gtag('event', 'formulario_contato_enviado', { roteiro: data.roteiro || '' }); window.gtag('event', 'generate_lead', { roteiro: data.roteiro || '' }); sendConversion(); }
+  if (trackingConsent) { window.gtag('event', 'formulario_contato_enviado', { roteiro: data.roteiro || '' }); window.gtag('event', 'generate_lead', { roteiro: data.roteiro || '' }); sendConversion('generate_lead'); }
   window.open(url, '_blank', 'noopener');
 });
 updateDepth();
