@@ -232,7 +232,7 @@ const galleryInfo = [
   { kicker: 'Calcita', title: 'Bolha de calcita', text: 'Uma formação que chama atenção pelo formato e pelo contexto geológico da galeria.' },
   { kicker: 'Parede natural', title: 'Cavidade', text: 'Leitura da rocha e dos vazios internos que estruturam o passeio e os salões.' },
   { kicker: 'Cristais', title: 'Cristalização', text: 'Detalhe dos minerais e do brilho característico de partes mais úmidas e claras.' },
-  { kicker: 'Galeria interna', title: 'Detalhes da Torrinha', text: 'Texturas e formas naturais que revelam a riqueza geológica das galerias.' }
+  { kicker: 'Cafeteria', title: 'Pausa na cafeteria', text: 'Depois do passeio, a cafeteria com vista para o paredão é o lugar para descansar e tomar um drink.' }
 ];
 
 const updateDepth = () => {
