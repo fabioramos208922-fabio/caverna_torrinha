@@ -21,11 +21,11 @@
   <meta property="og:url" content="https://cavernatorrinha.com/">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/png" href="assets/logo-256.png">
-  <link rel="preload" as="image" href="assets/opt/painacio-sm.webp" imagesrcset="assets/opt/painacio-sm.webp 720w, assets/opt/painacio.webp 1080w" imagesizes="(min-width: 900px) 45vw, 100vw" fetchpriority="high">
+  <link rel="preload" as="image" href="assets/opt/painacio-sm.webp" imagesrcset="assets/opt/painacio-sm.webp 720w, assets/opt/painacio.webp 1080w" imagesizes="100vw" fetchpriority="high">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20261106" />
+  <link rel="stylesheet" href="css/style.css?v=20261107" />
   <meta name="google-site-verification" content="hFqxfTrj_T1RgFs9ka3FHSBQKGp7HnU3VG2XKj6h06k" />
   <script>window.TRACKING_IDS = { metaPixel: '' };</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"TouristAttraction","name":"Caverna Torrinha","description":"Passeio guiado pela Caverna Torrinha, em Iraquara, Chapada Diamantina, Bahia. Quatro roteiros com flores de aragonita, agulhas de gipsita e helictites.","telephone":"+5575998561666","url":"https://cavernatorrinha.com/","image":"https://cavernatorrinha.com/assets/opt/og-torrinha.jpg","isAccessibleForFree":false,"priceRange":"R$ 40 - R$ 150","touristType":["Ecoturismo","Espeleoturismo"],"sameAs":["https://www.instagram.com/cavernatorrinha_oficial","https://www.facebook.com/caverna.torrinha"],"address":{"@type":"PostalAddress","addressLocality":"Iraquara","addressRegion":"BA","addressCountry":"BR"},"openingHoursSpecification":{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"08:00","closes":"17:00"},"makesOffer":[{"@type":"Offer","name":"Roteiro do Capitão","price":"40.00","priceCurrency":"BRL"},{"@type":"Offer","name":"Roteiro Valery","price":"70.00","priceCurrency":"BRL"},{"@type":"Offer","name":"Roteiro das Raridades","price":"80.00","priceCurrency":"BRL"},{"@type":"Offer","name":"Roteiro Completo","price":"150.00","priceCurrency":"BRL"}]}</script>
@@ -33,11 +33,6 @@
 </head>
 <body>
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
-  <div class="scroll-bg" aria-hidden="true">
-    <div class="scroll-bg__layer scroll-bg__layer--a" id="bgLayerA"></div>
-    <div class="scroll-bg__layer scroll-bg__layer--b" id="bgLayerB"></div>
-    <div class="scroll-bg__veil"></div>
-  </div>
   <div class="depth" aria-hidden="true">
     <div class="rail"></div>
     <div class="fill" id="depthFill"></div>
@@ -62,20 +57,17 @@
 
   <main id="conteudo">
     <section class="hero">
-      <div class="wrap grid-hero">
+      <img class="hero-bg" src="assets/opt/painacio-sm.webp" srcset="assets/opt/painacio-sm.webp 720w, assets/opt/painacio.webp 1080w" sizes="100vw" alt="" width="1080" height="1023" fetchpriority="high" decoding="async">
+      <div class="wrap hero-inner">
         <div class="hero-text">
           <div class="eyebrow">Iraquara · Chapada Diamantina · Bahia</div>
-          <h1>Passeio guiado na Caverna Torrinha</h1>
-          <p class="lead">Uma das cavernas mais completas do Brasil: flores de aragonita, agulhas de gipsita de até 70 cm e salões gigantes, com guia especializado do início ao fim.</p>
-          <div class="hero-price">
-            <span>Roteiros a partir de</span>
-            <strong>R$ 40<small>/pessoa</small></strong>
-          </div>
+          <h1>Desça às profundezas da <em>Chapada Diamantina</em></h1>
+          <p class="lead">Passeio guiado na Caverna Torrinha, uma das mais completas do Brasil: flores de aragonita, agulhas de gipsita de até 70 cm e salões gigantes.</p>
           <div class="actions">
             <a class="btn btn-whatsapp btn-lg" data-origem="topo" href="https://wa.me/5575998561666?text=Ol%C3%A1%21%20Vi%20o%20site%20da%20Caverna%20Torrinha%20e%20quero%20agendar%20uma%20visita." target="_blank" rel="noopener">
               <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-wa"/></svg>Agendar pelo WhatsApp
             </a>
-            <a class="btn btn-ghost btn-lg" href="#rotas">Ver roteiros e preços</a>
+            <a class="btn btn-ghost btn-lg" href="#rotas">Roteiros a partir de R$ 40</a>
           </div>
           <ul class="trust">
             <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"/></svg>Aberto todos os dias, 8h às 17h</li>
@@ -83,13 +75,13 @@
             <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"/></svg>Resposta rápida no WhatsApp</li>
           </ul>
         </div>
-        <div class="hero-panel">
-          <img class="hero-image" src="assets/opt/painacio-sm.webp" srcset="assets/opt/painacio-sm.webp 720w, assets/opt/painacio.webp 1080w" sizes="(min-width: 900px) 45vw, 100vw" alt="Formação que lembra o Morro do Pai Inácio dentro da Caverna Torrinha" width="1080" height="1023" fetchpriority="high" decoding="async">
-          <div class="panel-data">
-            <div class="stat"><strong>14,5 km</strong><span>mapeados</span></div>
-            <div class="stat"><strong>2,5 km</strong><span>visitáveis</span></div>
-            <div class="stat"><strong>4</strong><span>roteiros guiados</span></div>
-          </div>
+      </div>
+      <div class="hero-stats">
+        <div class="wrap hero-stats__row">
+          <div class="stat"><strong>14,5 km</strong><span>de galerias mapeadas</span></div>
+          <div class="stat"><strong>2,5 km</strong><span>abertos à visitação</span></div>
+          <div class="stat"><strong>4</strong><span>roteiros guiados</span></div>
+          <div class="stat"><strong>R$ 40</strong><span>a partir de, por pessoa</span></div>
         </div>
       </div>
     </section>
@@ -105,6 +97,7 @@
         </div>
         <div class="routes">
           <article class="card route" tabindex="0" role="button" aria-expanded="false" data-route="capitao">
+            <div class="route-media"><img src="assets/opt/cavidade-sm.webp" alt="Galeria do Roteiro do Capitão" loading="lazy" decoding="async"></div>
             <div class="route-top"><span class="tag">Primeira visita</span><p class="route-price"><small>R$</small>40</p></div>
             <h3>Roteiro do Capitão</h3>
             <p>O mais curto e histórico: estalactites, estalagmites, colunas e cortinas no trecho explorado desde 1850.</p>
@@ -112,6 +105,7 @@
             <a class="btn btn-whatsapp" data-origem="card-capitao" href="https://wa.me/5575998561666?text=Ol%C3%A1%21%20Vi%20o%20site%20da%20Caverna%20Torrinha%20e%20quero%20saber%20sobre%20o%20Roteiro%20do%20Capit%C3%A3o." target="_blank" rel="noopener">Reservar no WhatsApp</a>
           </article>
           <article class="card route" tabindex="0" role="button" aria-expanded="false" data-route="valery">
+            <div class="route-media"><img src="assets/opt/flor-sm.webp" alt="Flor de aragonita do Roteiro Valery" loading="lazy" decoding="async"></div>
             <div class="route-top"><span class="tag">Mais fotogênico</span><p class="route-price"><small>R$</small>70</p></div>
             <h3>Roteiro Valery</h3>
             <p>Foco nas formações raras: flores de aragonita, helictites e agulhas de gipsita.</p>
@@ -119,6 +113,7 @@
             <a class="btn btn-whatsapp" data-origem="card-valery" href="https://wa.me/5575998561666?text=Ol%C3%A1%21%20Vi%20o%20site%20da%20Caverna%20Torrinha%20e%20quero%20saber%20sobre%20o%20Roteiro%20Valery." target="_blank" rel="noopener">Reservar no WhatsApp</a>
           </article>
           <article class="card route" tabindex="0" role="button" aria-expanded="false" data-route="raridades">
+            <div class="route-media"><img src="assets/opt/bolha-sm.webp" alt="Bolha de calcita do Roteiro das Raridades" loading="lazy" decoding="async"></div>
             <div class="route-top"><span class="tag">Formações únicas</span><p class="route-price"><small>R$</small>80</p></div>
             <h3>Roteiro das Raridades</h3>
             <p>Bolha de calcita com flor de aragonita dentro, Salão dos Vulcões, helictite com flor na ponta e a réplica do Morro do Pai Inácio.</p>
@@ -126,6 +121,7 @@
             <a class="btn btn-whatsapp" data-origem="card-raridades" href="https://wa.me/5575998561666?text=Ol%C3%A1%21%20Vi%20o%20site%20da%20Caverna%20Torrinha%20e%20quero%20saber%20sobre%20o%20Roteiro%20das%20Raridades." target="_blank" rel="noopener">Reservar no WhatsApp</a>
           </article>
           <article class="card route route--featured" tabindex="0" role="button" aria-expanded="false" data-route="completo">
+            <div class="route-media"><img src="assets/opt/salao-branco-sm.webp" alt="Salão principal visto no Roteiro Completo" loading="lazy" decoding="async"></div>
             <div class="route-top"><span class="tag tag--solid">Mais completo</span><p class="route-price"><small>R$</small>150</p></div>
             <h3>Roteiro Completo</h3>
             <p>Reúne todos os roteiros anteriores e entrega a imersão mais ampla da Torrinha.</p>
@@ -190,6 +186,13 @@
       </div>
     </section>
 
+    <div class="photo-band" role="img" aria-label="Interior da Caverna Torrinha">
+      <div class="wrap photo-band__inner">
+        <p class="photo-band__quote">“Em meio à escuridão total, com faroletes iluminando o caminho, senti como se estivesse explorando as profundezas da Terra.”</p>
+        <span class="photo-band__cite">Visitante da Torrinha</span>
+      </div>
+    </div>
+
     <section id="visita" class="reveal">
       <div class="wrap">
         <div class="section-head">
@@ -219,7 +222,7 @@
       </div>
     </section>
 
-    <section id="depoimentos" class="reveal">
+    <section id="depoimentos" class="reveal section-light">
       <div class="wrap">
         <div class="section-head">
           <div>
@@ -266,11 +269,11 @@
 
     <section id="faq" class="reveal">
       <div class="wrap faq-wrap">
-        <div class="section-head">
-          <div>
-            <div class="eyebrow">Dúvidas</div>
-            <h2>Perguntas frequentes</h2>
-          </div>
+        <div class="faq-side">
+          <div class="eyebrow">Dúvidas</div>
+          <h2>Perguntas frequentes</h2>
+          <p>Não encontrou sua resposta? A equipe responde rapidinho.</p>
+          <a class="btn btn-whatsapp" data-origem="faq" href="https://wa.me/5575998561666?text=Ol%C3%A1%21%20Vi%20o%20site%20da%20Caverna%20Torrinha%20e%20tenho%20uma%20d%C3%BAvida." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-wa"/></svg>Perguntar no WhatsApp</a>
         </div>
         <div class="faq-list">
           <details><summary>Quanto custa visitar a caverna?</summary><p>De R$ 40 (Roteiro do Capitão) a R$ 150 (Roteiro Completo) por pessoa. Guia, capacete e lanterna estão inclusos.</p></details>
@@ -441,6 +444,6 @@
     <symbol id="icon-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
   </svg>
   <script src="js/utm.js?v=20261006"></script>
-  <script src="js/script.js?v=20261105"></script>
+  <script src="js/script.js?v=20261107"></script>
 </body>
 </html>

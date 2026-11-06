@@ -179,7 +179,7 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 const routeCards = Array.from(document.querySelectorAll('.route[data-route]'));
 const bgImages = ['3flor', 'agulha-1', 'bolha', 'cavidade', 'cristal', 'drinki', 'flor', 'salao-branco', 'vulcao'].map((name) => `assets/opt/${name}-sm.webp`);
-const isDesktop = window.matchMedia('(min-width: 900px)').matches;
+const isDesktop = window.matchMedia('(min-width: 900px)').matches && !!bgA && !!bgB;
 let activeBgIndex = -1;
 let showingA = true;
 let backgroundIndex = 0;
@@ -409,8 +409,7 @@ window.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowLeft' && lightbox.classList.contains('is-open')) stepLightbox(-1);
   if (event.key === 'ArrowRight' && lightbox.classList.contains('is-open')) stepLightbox(1);
 });
-bgA.style.opacity = '1';
-bgB.style.opacity = '0';
+if (bgA && bgB) { bgA.style.opacity = '1'; bgB.style.opacity = '0'; }
 const contactForm = document.getElementById('contactForm');
 contactForm?.addEventListener('submit', (event) => {
   event.preventDefault();
