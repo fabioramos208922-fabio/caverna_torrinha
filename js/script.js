@@ -36,10 +36,17 @@ document.getElementById('acceptCookies')?.addEventListener('click', () => saveCo
 document.getElementById('rejectCookies')?.addEventListener('click', () => saveConsent('rejected'));
 
 const currentUtm = {};
-try { const params = new URLSearchParams(window.location.search); const values = utm.read(window.location.search, document.referrer); const consent = localStorage.getItem('torrinha_cookie_consent') === 'accepted'; utm.keys.forEach(k => { if (values[k]) currentUtm[k] = values[k]; }); if (consent) utm.keys.forEach(k => { if (!currentUtm[k]) { try { currentUtm[k] = sessionStorage.getItem(k) || ''; } catch {} } if (currentUtm[k]) { try { sessionStorage.setItem(k, currentUtm[k]); } catch {} } }); } catch {}
+// Origem desta visita. Com consentimento, a origem fica guardada na sessão para não virar "acesso direto" ao recarregar a página.
+try {
+  const values = utm.read(window.location.search, document.referrer);
+  let consent = false; try { consent = localStorage.getItem('torrinha_cookie_consent') === 'accepted'; } catch {}
+  let saved = null; if (consent) { try { saved = JSON.parse(sessionStorage.getItem('torrinha_origem') || 'null'); } catch {} }
+  Object.assign(currentUtm, !utm.hasNewInfo(values) && saved ? saved : values);
+  if (consent) { try { sessionStorage.setItem('torrinha_origem', JSON.stringify(currentUtm)); } catch {} }
+} catch {}
 const getOrigem = () => utm.origem(currentUtm);
 const trackingData = () => Object.fromEntries(Object.entries(currentUtm).filter(([, v]) => v));
-const prepareWhatsApp = (button) => { if (!button.dataset.waBase) button.dataset.waBase = button.getAttribute('href') || ''; const url = new URL(button.dataset.waBase, window.location.href); const text = button.dataset.routeSpecs || url.searchParams.get('text') || ''; const origem = getOrigem(); url.searchParams.set('text', button.dataset.skipOrigem ? text : (origem ? `${text} (Origem: ${origem})` : text)); button.href = url.toString(); button.dataset.utmOrigem = origem; if (new URLSearchParams(window.location.search).get('utm_debug') === '1') console.debug('[UTM]', { captured: currentUtm, origem, href: button.href }); };
+const prepareWhatsApp = (button) => { if (!button.dataset.waBase) button.dataset.waBase = button.getAttribute('href') || ''; const url = new URL(button.dataset.waBase, window.location.href); const text = button.dataset.routeSpecs || url.searchParams.get('text') || ''; const origem = getOrigem(); url.searchParams.set('text', origem ? `${text}\n\nOrigem: ${origem}` : text); button.href = url.toString(); button.dataset.utmOrigem = origem; if (new URLSearchParams(window.location.search).get('utm_debug') === '1') console.debug('[UTM]', { captured: currentUtm, origem, href: button.href }); };
 // Consent Mode v2 decide o que o Google pode armazenar; sem consentimento, o gtag envia sinais sem cookies (conversões modeladas).
 const canTag = () => typeof window.gtag === 'function';
 const sendConversion = (eventName) => { const label = ADS_CONVERSION_LABELS[eventName]; if (label && typeof window.gtag === 'function') window.gtag('event', 'conversion', { send_to: `AW-18500249861/${label}` }); };
@@ -220,7 +227,6 @@ routeCards.forEach((card) => {
   const data = routeDetails[card.dataset.route];
   const button = card.querySelector('.btn-whatsapp');
   if (!data || !button) return;
-  button.dataset.skipOrigem = 'true';
   button.dataset.routeSpecs = [`Ol\u00e1! Vim pelo site da Caverna Torrinha e gostaria de informa\u00e7\u00f5es sobre o ${data.kicker} e os outros roteiros dispon\u00edveis.`, `Acesso: ${data.stats.find(([label]) => label === 'Acesso' || label === 'Acesso a p\u00e9')?.[1] || ''}`, `Dura\u00e7\u00e3o: ${data.stats.find(([label]) => label === 'Dura\u00e7\u00e3o')?.[1] || ''}`, `Valor: ${data.stats.find(([label]) => label === 'Valor por pessoa')?.[1] || ''}`].join('\n');
 });
 const galleryInfo = [
@@ -312,7 +318,6 @@ const renderRouteModal = (routeKey) => {
   const cta = document.createElement('a');
   cta.className = 'btn btn-primary btn-whatsapp route-modal__whatsapp';
   cta.dataset.origem = `modal-${routeKey}`;
-  cta.dataset.skipOrigem = 'true';
   cta.dataset.routeSpecs = [`Ol\u00e1! Vim pelo site da Caverna Torrinha e gostaria de informa\u00e7\u00f5es sobre o ${data.kicker} e os outros roteiros dispon\u00edveis.`, `Acesso: ${data.stats.find(([label]) => label === 'Acesso' || label === 'Acesso a p\u00e9')?.[1] || ''}`, `Dura\u00e7\u00e3o: ${data.stats.find(([label]) => label === 'Dura\u00e7\u00e3o')?.[1] || ''}`, `Valor: ${data.stats.find(([label]) => label === 'Valor por pessoa')?.[1] || ''}`].join('\n');
   cta.target = '_blank';
   cta.rel = 'noopener';
