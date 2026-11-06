@@ -2,6 +2,7 @@ const fill = document.getElementById('depthFill');
 const label = document.getElementById('depthLabel');
 const bgA = document.getElementById('bgLayerA');
 const bgB = document.getElementById('bgLayerB');
+const menuThemeToggle = document.getElementById('menuThemeToggle');
 const formNome = document.getElementById('nome');
 const formEmail = document.getElementById('email');
 const formTelefone = document.getElementById('telefone');
@@ -36,7 +37,7 @@ document.getElementById('acceptCookies')?.addEventListener('click', () => saveCo
 document.getElementById('rejectCookies')?.addEventListener('click', () => saveConsent('rejected'));
 
 const currentUtm = {};
-// Origem desta visita. Com consentimento, a origem fica guardada na sessão para não virar "acesso direto" ao recarregar a página.
+// Origem desta visita. Com consentimento, fica guardada na sessão para não virar "acesso direto" ao recarregar.
 try {
   const values = utm.read(window.location.search, document.referrer);
   let consent = false; try { consent = localStorage.getItem('torrinha_cookie_consent') === 'accepted'; } catch {}
@@ -46,8 +47,9 @@ try {
 } catch {}
 const getOrigem = () => utm.origem(currentUtm);
 const trackingData = () => Object.fromEntries(Object.entries(currentUtm).filter(([, v]) => v));
-const prepareWhatsApp = (button) => { if (!button.dataset.waBase) button.dataset.waBase = button.getAttribute('href') || ''; const url = new URL(button.dataset.waBase, window.location.href); const text = button.dataset.routeSpecs || url.searchParams.get('text') || ''; const origem = getOrigem(); url.searchParams.set('text', origem ? `${text}\n\nOrigem: ${origem}` : text); button.href = url.toString(); button.dataset.utmOrigem = origem; if (new URLSearchParams(window.location.search).get('utm_debug') === '1') console.debug('[UTM]', { captured: currentUtm, origem, href: button.href }); };
-// Consent Mode v2 decide o que o Google pode armazenar; sem consentimento, o gtag envia sinais sem cookies (conversões modeladas).
+const prepareWhatsApp = (button) => { if (!button.dataset.waBase) button.dataset.waBase = button.getAttribute('href') || ''; const url = new URL(button.dataset.waBase, window.location.href); const text = button.dataset.routeSpecs || url.searchParams.get('text') || ''; const origem = getOrigem(); url.searchParams.set('text', origem ? `${text}
+
+Origem: ${origem}` : text); button.href = url.toString(); button.dataset.utmOrigem = origem; if (new URLSearchParams(window.location.search).get('utm_debug') === '1') console.debug('[UTM]', { captured: currentUtm, origem, href: button.href }); };
 const canTag = () => typeof window.gtag === 'function';
 const sendConversion = (eventName) => { const label = ADS_CONVERSION_LABELS[eventName]; if (label && typeof window.gtag === 'function') window.gtag('event', 'conversion', { send_to: `AW-18500249861/${label}` }); };
 const trackWhatsAppClick = (button) => { prepareWhatsApp(button); const data = { ...trackingData(), local_botao: button.dataset.origem || 'outro', roteiro: button.dataset.roteiro || button.closest('[data-route]')?.dataset.route || '' }; if (!canTag()) return; window.gtag('event', 'clique_whatsapp', { ...data, transport_type: 'beacon' }); sendConversion('clique_whatsapp'); };
@@ -73,6 +75,7 @@ const routeModalGrid = document.getElementById('routeModalGrid');
 const routeModalNotes = document.getElementById('routeModalNotes');
 const maxMeters = 14500;
 const reveals = document.querySelectorAll('.reveal');
+const cards = document.querySelectorAll('.card, .shot, .info-item, details, .hero-panel');
 const galleryShots = Array.from(document.querySelectorAll('.shot'));
 const aiChat = document.getElementById('aiChat');
 const aiChatOpen = document.getElementById('aiChatOpen');
@@ -185,8 +188,17 @@ window.addEventListener('scroll', () => {
   }
 }, { passive: true });
 const routeCards = Array.from(document.querySelectorAll('.route[data-route]'));
-const bgImages = ['3flor', 'agulha-1', 'bolha', 'cavidade', 'cristal', 'drinki', 'flor', 'salao-branco', 'vulcao'].map((name) => `assets/opt/${name}-sm.webp`);
-const isDesktop = window.matchMedia('(min-width: 900px)').matches && !!bgA && !!bgB;
+const bgImages = [
+  'assets/3flor.jpg',
+  'assets/agulha-1.jpg',
+  'assets/bolha.jpg',
+  'assets/cavidade.jpg',
+  'assets/cristal.png',
+  'assets/drinki.jpg',
+  'assets/flor.png',
+  'assets/salao-branco.jpg',
+  'assets/vulcao.jpg'
+];
 let activeBgIndex = -1;
 let showingA = true;
 let backgroundIndex = 0;
@@ -238,7 +250,7 @@ const galleryInfo = [
   { kicker: 'Calcita', title: 'Bolha de calcita', text: 'Uma formação que chama atenção pelo formato e pelo contexto geológico da galeria.' },
   { kicker: 'Parede natural', title: 'Cavidade', text: 'Leitura da rocha e dos vazios internos que estruturam o passeio e os salões.' },
   { kicker: 'Cristais', title: 'Cristalização', text: 'Detalhe dos minerais e do brilho característico de partes mais úmidas e claras.' },
-  { kicker: 'Cafeteria', title: 'Pausa na cafeteria', text: 'Depois do passeio, a cafeteria com vista para o paredão é o lugar para descansar e tomar um drink.' }
+  { kicker: 'Galeria interna', title: 'Detalhes da Torrinha', text: 'Texturas e formas naturais que revelam a riqueza geológica das galerias.' }
 ];
 
 const updateDepth = () => {
@@ -282,6 +294,12 @@ const advanceBackground = () => {
   updateBackgroundMotion();
 };
 
+const setMenuTheme = (dark) => {
+  document.body.classList.toggle('menu-dark', dark);
+  document.body.classList.toggle('menu-light', !dark);
+  menuThemeToggle.setAttribute('aria-pressed', String(dark));
+  menuThemeToggle.textContent = dark ? 'Menu claro' : 'Menu escuro';
+};
 
 const buildWhatsAppLink = () => {
   const nome = formNome.value.trim();
@@ -374,7 +392,21 @@ const closeLightbox = () => {
 reveals.forEach(section => observer.observe(section));
 window.addEventListener('scroll', updateDepth, { passive: true });
 window.addEventListener('resize', updateDepth);
-if (isDesktop) window.addEventListener('scroll', updateBackgroundMotion, { passive: true });
+window.addEventListener('scroll', updateBackgroundMotion, { passive: true });
+window.addEventListener('resize', updateBackgroundMotion);
+cards.forEach((el, index) => {
+  el.style.setProperty('--delay', `${Math.min(index * 70, 420)}ms`);
+  el.addEventListener('mousemove', (event) => {
+    if (el.classList.contains('shot')) return;
+    const rect = el.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 8;
+    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 8;
+    el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+  });
+  el.addEventListener('mouseleave', () => {
+    el.style.transform = '';
+  });
+});
 galleryShots.forEach((shot) => {
   shot.addEventListener('click', () => {
     openLightbox(galleryShots.indexOf(shot));
@@ -414,7 +446,16 @@ window.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowLeft' && lightbox.classList.contains('is-open')) stepLightbox(-1);
   if (event.key === 'ArrowRight' && lightbox.classList.contains('is-open')) stepLightbox(1);
 });
-if (bgA && bgB) { bgA.style.opacity = '1'; bgB.style.opacity = '0'; }
+bgA.style.backgroundImage = `url("${bgImages[0]}")`;
+bgB.style.backgroundImage = `url("${bgImages[0]}")`;
+bgA.style.opacity = '1';
+bgB.style.opacity = '0';
+bgA.style.transform = 'scale(1.12)';
+bgB.style.transform = 'scale(1.12)';
+setMenuTheme(true);
+menuThemeToggle.addEventListener('click', () => {
+  setMenuTheme(!document.body.classList.contains('menu-dark'));
+});
 const contactForm = document.getElementById('contactForm');
 contactForm?.addEventListener('submit', (event) => {
   event.preventDefault();
@@ -425,10 +466,7 @@ contactForm?.addEventListener('submit', (event) => {
   window.open(url, '_blank', 'noopener');
 });
 updateDepth();
-// O fundo animado só existe no desktop; no celular não baixamos essas imagens.
-if (isDesktop) {
-  updateBackgroundMotion();
-  setBackground(0);
-  window.addEventListener('load', () => bgImages.slice(1).forEach((src) => { const image = new Image(); image.src = src; }));
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(advanceBackground, 6500);
-}
+updateBackgroundMotion();
+setBackground(0);
+window.addEventListener('load', () => bgImages.slice(1).forEach((src) => { const image = new Image(); image.src = src; }));
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && window.matchMedia('(min-width: 900px)').matches) setInterval(advanceBackground, 6500);
