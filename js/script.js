@@ -2,7 +2,6 @@ const fill = document.getElementById('depthFill');
 const label = document.getElementById('depthLabel');
 const bgA = document.getElementById('bgLayerA');
 const bgB = document.getElementById('bgLayerB');
-const menuThemeToggle = document.getElementById('menuThemeToggle');
 const formNome = document.getElementById('nome');
 const formEmail = document.getElementById('email');
 const formTelefone = document.getElementById('telefone');
@@ -41,9 +40,11 @@ try { const params = new URLSearchParams(window.location.search); const values =
 const getOrigem = () => utm.origem(currentUtm);
 const trackingData = () => Object.fromEntries(Object.entries(currentUtm).filter(([, v]) => v));
 const prepareWhatsApp = (button) => { if (!button.dataset.waBase) button.dataset.waBase = button.getAttribute('href') || ''; const url = new URL(button.dataset.waBase, window.location.href); const text = button.dataset.routeSpecs || url.searchParams.get('text') || ''; const origem = getOrigem(); url.searchParams.set('text', button.dataset.skipOrigem ? text : (origem ? `${text} (Origem: ${origem})` : text)); button.href = url.toString(); button.dataset.utmOrigem = origem; if (new URLSearchParams(window.location.search).get('utm_debug') === '1') console.debug('[UTM]', { captured: currentUtm, origem, href: button.href }); };
-const sendConversion = (eventName) => { const label = ADS_CONVERSION_LABELS[eventName]; if (trackingConsent && label && typeof window.gtag === 'function') window.gtag('event', 'conversion', { send_to: `AW-18500249861/${label}` }); };
-const trackWhatsAppClick = (button) => { prepareWhatsApp(button); const data = { ...trackingData(), local_botao: button.dataset.origem || 'outro', roteiro: button.dataset.roteiro || button.closest('[data-route]')?.dataset.route || '' }; if (!trackingConsent) return; window.gtag('event', 'clique_whatsapp', { ...data, transport_type: 'beacon' }); sendConversion('clique_whatsapp'); };
-document.addEventListener('click', (event) => { const link = event.target.closest('a[href]'); if (!link) return; const href = link.href.toLowerCase(); if (/^https:\/\/(wa\.me|api\.whatsapp\.com)\//.test(href)) trackWhatsAppClick(link); if (href.startsWith('tel:') && trackingConsent) { window.gtag('event', 'clique_telefone', { local_botao: link.dataset.origem || 'outro' }); sendConversion('clique_telefone'); } });
+// Consent Mode v2 decide o que o Google pode armazenar; sem consentimento, o gtag envia sinais sem cookies (conversões modeladas).
+const canTag = () => typeof window.gtag === 'function';
+const sendConversion = (eventName) => { const label = ADS_CONVERSION_LABELS[eventName]; if (label && typeof window.gtag === 'function') window.gtag('event', 'conversion', { send_to: `AW-18500249861/${label}` }); };
+const trackWhatsAppClick = (button) => { prepareWhatsApp(button); const data = { ...trackingData(), local_botao: button.dataset.origem || 'outro', roteiro: button.dataset.roteiro || button.closest('[data-route]')?.dataset.route || '' }; if (!canTag()) return; window.gtag('event', 'clique_whatsapp', { ...data, transport_type: 'beacon' }); sendConversion('clique_whatsapp'); };
+document.addEventListener('click', (event) => { const link = event.target.closest('a[href]'); if (!link) return; const href = link.href.toLowerCase(); if (/^https:\/\/(wa\.me|api\.whatsapp\.com)\//.test(href)) trackWhatsAppClick(link); if (href.startsWith('tel:') && canTag()) { window.gtag('event', 'clique_telefone', { local_botao: link.dataset.origem || 'outro' }); sendConversion('clique_telefone'); } });
 ['mousedown', 'touchstart', 'focusin'].forEach(type => document.addEventListener(type, event => { const button = event.target.closest('a[href^="https://wa.me"], a[href^="https://api.whatsapp.com"]'); if (button) prepareWhatsApp(button); }, type === 'touchstart' ? { passive: true } : undefined));
 document.querySelectorAll('.btn-whatsapp').forEach(prepareWhatsApp);
 const lightbox = document.getElementById('lightbox');
@@ -65,7 +66,6 @@ const routeModalGrid = document.getElementById('routeModalGrid');
 const routeModalNotes = document.getElementById('routeModalNotes');
 const maxMeters = 14500;
 const reveals = document.querySelectorAll('.reveal');
-const cards = document.querySelectorAll('.card, .shot, .info-item, details, .hero-panel');
 const galleryShots = Array.from(document.querySelectorAll('.shot'));
 const aiChat = document.getElementById('aiChat');
 const aiChatOpen = document.getElementById('aiChatOpen');
@@ -178,17 +178,8 @@ window.addEventListener('scroll', () => {
   }
 }, { passive: true });
 const routeCards = Array.from(document.querySelectorAll('.route[data-route]'));
-const bgImages = [
-  'assets/3flor.jpg',
-  'assets/agulha-1.jpg',
-  'assets/bolha.jpg',
-  'assets/cavidade.jpg',
-  'assets/cristal.png',
-  'assets/drinki.jpg',
-  'assets/flor.png',
-  'assets/salao-branco.jpg',
-  'assets/vulcao.jpg'
-];
+const bgImages = ['3flor', 'agulha-1', 'bolha', 'cavidade', 'cristal', 'drinki', 'flor', 'salao-branco', 'vulcao'].map((name) => `assets/opt/${name}-sm.webp`);
+const isDesktop = window.matchMedia('(min-width: 900px)').matches;
 let activeBgIndex = -1;
 let showingA = true;
 let backgroundIndex = 0;
@@ -285,12 +276,6 @@ const advanceBackground = () => {
   updateBackgroundMotion();
 };
 
-const setMenuTheme = (dark) => {
-  document.body.classList.toggle('menu-dark', dark);
-  document.body.classList.toggle('menu-light', !dark);
-  menuThemeToggle.setAttribute('aria-pressed', String(dark));
-  menuThemeToggle.textContent = dark ? 'Menu claro' : 'Menu escuro';
-};
 
 const buildWhatsAppLink = () => {
   const nome = formNome.value.trim();
@@ -384,21 +369,7 @@ const closeLightbox = () => {
 reveals.forEach(section => observer.observe(section));
 window.addEventListener('scroll', updateDepth, { passive: true });
 window.addEventListener('resize', updateDepth);
-window.addEventListener('scroll', updateBackgroundMotion, { passive: true });
-window.addEventListener('resize', updateBackgroundMotion);
-cards.forEach((el, index) => {
-  el.style.setProperty('--delay', `${Math.min(index * 70, 420)}ms`);
-  el.addEventListener('mousemove', (event) => {
-    if (el.classList.contains('shot')) return;
-    const rect = el.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 8;
-    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 8;
-    el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-  });
-  el.addEventListener('mouseleave', () => {
-    el.style.transform = '';
-  });
-});
+if (isDesktop) window.addEventListener('scroll', updateBackgroundMotion, { passive: true });
 galleryShots.forEach((shot) => {
   shot.addEventListener('click', () => {
     openLightbox(galleryShots.indexOf(shot));
@@ -438,27 +409,22 @@ window.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowLeft' && lightbox.classList.contains('is-open')) stepLightbox(-1);
   if (event.key === 'ArrowRight' && lightbox.classList.contains('is-open')) stepLightbox(1);
 });
-bgA.style.backgroundImage = `url("${bgImages[0]}")`;
-bgB.style.backgroundImage = `url("${bgImages[0]}")`;
 bgA.style.opacity = '1';
 bgB.style.opacity = '0';
-bgA.style.transform = 'scale(1.12)';
-bgB.style.transform = 'scale(1.12)';
-setMenuTheme(true);
-menuThemeToggle.addEventListener('click', () => {
-  setMenuTheme(!document.body.classList.contains('menu-dark'));
-});
 const contactForm = document.getElementById('contactForm');
 contactForm?.addEventListener('submit', (event) => {
   event.preventDefault();
   const url = buildWhatsAppLink();
   const data = { ...trackingData(), origem: getOrigem() };
   document.querySelectorAll('#contactForm input[type="hidden"]').forEach((field) => { field.value = currentUtm[field.name] || ''; });
-  if (trackingConsent) { window.gtag('event', 'formulario_contato_enviado', { roteiro: data.roteiro || '' }); window.gtag('event', 'generate_lead', { roteiro: data.roteiro || '' }); sendConversion('generate_lead'); }
+  if (canTag()) { window.gtag('event', 'formulario_contato_enviado', { roteiro: data.roteiro || '' }); window.gtag('event', 'generate_lead', { roteiro: data.roteiro || '' }); sendConversion('generate_lead'); }
   window.open(url, '_blank', 'noopener');
 });
 updateDepth();
-updateBackgroundMotion();
-setBackground(0);
-window.addEventListener('load', () => bgImages.slice(1).forEach((src) => { const image = new Image(); image.src = src; }));
-if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && window.matchMedia('(min-width: 900px)').matches) setInterval(advanceBackground, 6500);
+// O fundo animado só existe no desktop; no celular não baixamos essas imagens.
+if (isDesktop) {
+  updateBackgroundMotion();
+  setBackground(0);
+  window.addEventListener('load', () => bgImages.slice(1).forEach((src) => { const image = new Image(); image.src = src; }));
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(advanceBackground, 6500);
+}
